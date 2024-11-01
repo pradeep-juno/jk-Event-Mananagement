@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "599534844125",
+    "project_id": "jk-event-management-65905",
+    "storage_bucket": "jk-event-management-65905.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599534844125:android:3e5e14c20e2ac77f500334",
+        "android_client_info": {
+          "package_name": "com.example.jk_evnt_proj"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFwj65T3oZIGYJ2bmacwUwHR4Q5dejFQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
