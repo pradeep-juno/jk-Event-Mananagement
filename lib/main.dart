@@ -1,9 +1,11 @@
 // lib/main.dart
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; // Import this for global localization
 import 'package:get/get.dart';
 import 'package:jk_evnt_proj/screens/month_end_closing_page.dart';
 import 'package:jk_evnt_proj/screens/staffs_page.dart';
+import 'package:month_year_picker/month_year_picker.dart'; // Import the package for localization
 
 import 'controllers/staffs.dart';
 import 'firebase_options.dart';
@@ -34,6 +36,15 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const HomePage(),
+      localizationsDelegates: const [
+        MonthYearPickerLocalizations.delegate, // Add this line
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('en', ''), // Remove 'const' from here
+      ],
       getPages: [
         GetPage(name: '/departments', page: () => DepartmentsPage()),
         GetPage(name: '/positions', page: () => PositionsPage()),
