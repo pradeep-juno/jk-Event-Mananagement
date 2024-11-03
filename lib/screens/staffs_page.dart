@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/staffs.dart';
 
@@ -7,6 +9,23 @@ class StaffPage extends StatelessWidget {
   StaffPage({Key? key}) : super(key: key);
 
   final Staffs staffs = Get.put(Staffs());
+
+  // Method to fetch staff data
+  void _fetchStaff() {
+    staffs.fetchStaff();
+  }
+
+  Future<void> _selectDate(BuildContext context, Rx<DateTime?> date) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: date.value ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      date.value = picked;
+    }
+  }
 
   void _showStaffDialog({String? id}) {
     // Reset fields if adding new staff
@@ -24,7 +43,7 @@ class StaffPage extends StatelessWidget {
             controller: staffs.mobileController,
             decoration: const InputDecoration(labelText: 'Mobile No'),
             keyboardType: TextInputType.phone,
-            maxLength: 10, // Limit to 10 digits
+            maxLength: 10,
           ),
           TextField(
             controller: staffs.passwordController,
@@ -38,9 +57,11 @@ class StaffPage extends StatelessWidget {
           ),
           DropdownButton<String>(
             hint: const Text('Select Department'),
-            value: staffs.selectedDepartment,
+            value: staffs.selectedDepartment.value,
             onChanged: (value) {
-              staffs.selectedDepartment = value;
+              if (value != null) {
+                staffs.selectedDepartment.value = value;
+              }
             },
             items: [
               DropdownMenuItem(
@@ -58,9 +79,11 @@ class StaffPage extends StatelessWidget {
           ),
           DropdownButton<String>(
             hint: const Text('Select Position'),
-            value: staffs.selectedPosition,
+            value: staffs.selectedPosition.value,
             onChanged: (value) {
-              staffs.selectedPosition = value;
+              if (value != null) {
+                staffs.selectedPosition.value = value;
+              }
             },
             items: [
               DropdownMenuItem(value: 'Manager', child: Text('Manager')),
@@ -69,6 +92,26 @@ class StaffPage extends StatelessWidget {
               DropdownMenuItem(value: 'Staff', child: Text('Staff')),
             ],
           ),
+          const SizedBox(height: 8),
+          Obx(() {
+            final dateOfBirth = staffs.dateOfBirth.value;
+            return TextButton(
+              onPressed: () => _selectDate(Get.context!, staffs.dateOfBirth),
+              child: Text(
+                'Date of Birth: ${dateOfBirth != null ? DateFormat('yyyy-MM-dd').format(dateOfBirth) : 'Select Date'}',
+              ),
+            );
+          }),
+          const SizedBox(height: 8),
+          Obx(() {
+            final joiningDate = staffs.joiningDate.value;
+            return TextButton(
+              onPressed: () => _selectDate(Get.context!, staffs.joiningDate),
+              child: Text(
+                'Joining Date: ${joiningDate != null ? DateFormat('yyyy-MM-dd').format(joiningDate) : 'Select Date'}',
+              ),
+            );
+          }),
         ],
       ),
       textCancel: 'Cancel',
@@ -85,6 +128,9 @@ class StaffPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Fetch staff list when the page is built
+    _fetchStaff();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Staff Details'),
@@ -97,11 +143,21 @@ class StaffPage extends StatelessWidget {
         return ListView.builder(
           itemCount: staffs.staffList.length,
           itemBuilder: (context, index) {
-            final doc = staffs.staffList[index];
-            final name = doc['name'];
-            final position = doc['position'];
-            final department = doc['department'];
-            final createdAt = doc['createdAt'];
+            final DocumentSnapshot doc = staffs.staffList[index];
+            final data = doc.data() as Map<String, dynamic>?;
+
+            // Extract the required fields
+            final name = data?['name'] ?? 'N/A';
+            final position = data?['position'] ?? 'N/A';
+            final department = data?['department'] ?? 'N/A';
+            final password = data?['password'] ?? 'N/A';
+            final createdAt = data?['createdAt'] != null
+                ? (data!['createdAt'] is Timestamp
+                    ? (data['createdAt'] as Timestamp).toDate().toString()
+                    : data['createdAt']
+                        as String) // Handle case where createdAt is a String
+                : 'N/A';
+            final joiningDate = data?['joiningDate'] ?? 'N/A';
 
             return ListTile(
               title: Text('$name, $position'),
@@ -109,6 +165,8 @@ class StaffPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Department: $department'),
+                  Text('Password: $password'),
+                  Text('Joining Date: $joiningDate'),
                   Text('Created At: $createdAt'),
                 ],
               ),

@@ -3,17 +3,22 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jk_evnt_proj/screens/month_end_closing_page.dart';
+import 'package:jk_evnt_proj/screens/staffs_page.dart';
 
+import 'controllers/staffs.dart';
 import 'firebase_options.dart';
 import 'screens/departments_page.dart';
 import 'screens/positions_page.dart';
-import 'screens/staffs_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ); // Initialize Firebase
+
+  // Initialize the Staffs controller at the start of the app
+  Get.put(Staffs());
+
   runApp(const MyApp());
 }
 
@@ -32,7 +37,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/departments', page: () => DepartmentsPage()),
         GetPage(name: '/positions', page: () => PositionsPage()),
-        GetPage(name: '/staffs', page: () => StaffPage()),
+        GetPage(name: '/staffs', page: () => StaffPage()), // Updated route
         GetPage(name: '/monthEnd', page: () => MonthEndClosingPage()),
       ],
     );
