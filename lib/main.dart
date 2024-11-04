@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; // Import this for global localization
 import 'package:get/get.dart';
+import 'package:jk_evnt_proj/page/designs.dart';
 import 'package:jk_evnt_proj/screens/month_end_closing_page.dart';
 import 'package:jk_evnt_proj/screens/staffs_page.dart';
 import 'package:month_year_picker/month_year_picker.dart'; // Import the package for localization
@@ -61,45 +62,50 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('JK Event Management'),
-      ),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            EventCard(name: 'Departments', route: '/departments'),
-            EventCard(name: 'Positions', route: '/positions'),
-            EventCard(name: 'Create Staffs', route: '/staffs'),
-            EventCard(name: 'Month End Closing', route: '/monthEnd'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class EventCard extends StatelessWidget {
-  final String name;
-  final String route;
-
-  const EventCard({required this.name, required this.route, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Get.toNamed(route),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(name,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            ],
+      // Replacing AppBar with a custom Container
+      body: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.only(top: 20, bottom: 20),
+            color: Colors.blue, // Set background color
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'JK',
+                  style: TextStyle(
+                    fontSize: 60,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  'Event Management',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          Expanded(
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  EventCard(name: 'Departments', route: '/departments'),
+                  EventCard(name: 'Positions', route: '/positions'),
+                  EventCard(name: 'Create Staffs', route: '/staffs'),
+                  EventCard(name: 'Month End Closing', route: '/monthEnd'),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

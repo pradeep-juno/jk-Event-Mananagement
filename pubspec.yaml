@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^6.3.1
   month_year_picker: ^0.4.0+1
   flutter_localization: ^0.2.2
+  glowy_borders: ^1.0.2
 
 dev_dependencies:
   flutter_test:
