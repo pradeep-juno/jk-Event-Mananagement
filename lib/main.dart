@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; // Import this for global localization
 import 'package:get/get.dart';
 import 'package:jk_evnt_proj/page/designs.dart';
+import 'package:jk_evnt_proj/screens/login_page.dart';
 import 'package:jk_evnt_proj/screens/month_end_closing_page.dart';
 import 'package:jk_evnt_proj/screens/staffs_page.dart';
 import 'package:month_year_picker/month_year_picker.dart'; // Import the package for localization
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: LoginPage(),
       localizationsDelegates: const [
         MonthYearPickerLocalizations.delegate, // Add this line
         GlobalMaterialLocalizations.delegate,
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
         Locale('en', ''), // Remove 'const' from here
       ],
       getPages: [
+        GetPage(name: '/login', page: () => LoginPage()),
         GetPage(name: '/departments', page: () => DepartmentsPage()),
         GetPage(name: '/positions', page: () => PositionsPage()),
         GetPage(name: '/staffs', page: () => StaffPage()), // Updated route
@@ -62,31 +64,50 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Replacing AppBar with a custom Container
       body: Column(
         children: [
           Container(
             padding: EdgeInsets.only(top: 20, bottom: 20),
             color: Colors.blue, // Set background color
             width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Stack(
               children: [
-                Text(
-                  'JK',
-                  style: TextStyle(
-                    fontSize: 60,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                // Centered title
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'JK',
+                        style: TextStyle(
+                          fontSize: 60,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        'Event Management',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 5),
-                Text(
-                  'Event Management',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.white,
+                // Logout icon positioned in the top right corner
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: IconButton(
+                    icon: const Icon(Icons.logout,
+                        color: Colors.white), // Logout icon
+                    onPressed: () {
+                      // Implement your logout logic here
+                      Get.offNamed('/login'); // Navigate to the LoginPage
+                    },
                   ),
                 ),
               ],
