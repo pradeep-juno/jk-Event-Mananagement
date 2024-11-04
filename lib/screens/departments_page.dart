@@ -17,6 +17,22 @@ class DepartmentsPage extends StatelessWidget {
       content: TextField(
         controller: departments.departmentController,
         decoration: const InputDecoration(labelText: 'Department Name'),
+        onChanged: (value) {
+          if (value.isNotEmpty) {
+            // Capitalize the first letter and ensure the rest are lowercase
+            String capitalized =
+                value[0].toUpperCase() + value.substring(1).toLowerCase();
+            // Update the text field only if the current input is different
+            if (value != capitalized) {
+              departments.departmentController.text = capitalized;
+              // Move the cursor to the end of the text
+              departments.departmentController.selection =
+                  TextSelection.fromPosition(
+                TextPosition(offset: capitalized.length),
+              );
+            }
+          }
+        },
       ),
       textCancel: 'Cancel',
       textConfirm: 'Submit',

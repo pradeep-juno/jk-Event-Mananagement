@@ -18,6 +18,21 @@ class PositionsPage extends StatelessWidget {
       content: TextField(
         controller: positions.positionController,
         decoration: const InputDecoration(labelText: 'Position Name'),
+        onChanged: (value) {
+          if (value.isNotEmpty) {
+            String capitalized =
+                value[0].toUpperCase() + value.substring(1).toLowerCase();
+            // Only update if the text has changed
+            if (value != capitalized) {
+              positions.positionController.text = capitalized;
+              // Move the cursor to the end of the text
+              positions.positionController.selection =
+                  TextSelection.fromPosition(
+                TextPosition(offset: capitalized.length),
+              );
+            }
+          }
+        },
       ),
       textCancel: 'Cancel',
       textConfirm: 'Submit',
