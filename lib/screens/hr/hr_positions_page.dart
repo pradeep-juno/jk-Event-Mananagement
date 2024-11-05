@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../controllers/positions.dart';
+import '../../controllers/positions.dart';
 // Make sure to import the correct controller
 
-class PositionsPage extends StatelessWidget {
-  PositionsPage({Key? key}) : super(key: key);
+class HRPositionsPage extends StatelessWidget {
+  HRPositionsPage({Key? key}) : super(key: key);
 
   final Positions positions = Get.put(Positions());
 

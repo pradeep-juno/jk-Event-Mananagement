@@ -11,14 +11,40 @@ class Staffs extends GetxController {
   var passwordController = TextEditingController();
   var addressController = TextEditingController();
 
+  var selectedDepartment = ''.obs; // Observables for selected department
+  var departmentsList = <String>[].obs; // Observable list for departments
+
   // Reactive variables
   var dateOfBirth = Rx<DateTime?>(null);
   var joiningDate = Rx<DateTime?>(null);
-  var selectedDepartment = 'Event Management'.obs; // Default value
+  // var selectedDepartment = 'Event Management'.obs; // Default value
   var selectedPosition = 'Manager'.obs; // Default value
 
   // Staff list for displaying data
   var staffList = <DocumentSnapshot>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchDepartments();
+    selectedDepartment.value = '';
+  }
+
+  void fetchDepartments() async {
+    try {
+      var snapshot =
+          await FirebaseFirestore.instance.collection('departments').get();
+      // Use a Set to ensure uniqueness
+      var departmentNames =
+          snapshot.docs.map((doc) => doc['name'] as String).toSet().toList();
+      departmentsList.value = departmentNames; // Updating the observable list
+      print(
+          'Fetched Departments: $departmentNames'); // Print statement for debugging
+      print('Unique Departments: ${departmentsList.toSet().toList()}');
+    } catch (e) {
+      print('Error fetching departments: $e');
+    }
+  }
 
   // Clear fields
   void clearFields() {
@@ -136,7 +162,7 @@ class Staffs extends GetxController {
   // Send WhatsApp message
   Future<void> _sendWhatsAppMessage(
       String phoneNumber, String memberID, String memberPassword) async {
-    final String message = 'Hello $nameController.text,\n\n'
+    final String message = 'Hello ${nameController.text},\n\n'
         'Welcome to JK EVENT MANAGEMENT! \n\n'
         'This is your MemberID and MemberPassword. \n\n'
         'Member ID: $memberID\n'

@@ -4,16 +4,16 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
-import '../controllers/monthendcontroller.dart';
+import '../../controllers/monthendcontroller.dart';
 
-class MonthEndClosingPage extends StatefulWidget {
-  const MonthEndClosingPage({Key? key}) : super(key: key);
+class HRMonthEndClosingPage extends StatefulWidget {
+  const HRMonthEndClosingPage({Key? key}) : super(key: key);
 
   @override
-  State<MonthEndClosingPage> createState() => _MonthEndClosingPageState();
+  State<HRMonthEndClosingPage> createState() => _HRMonthEndClosingPageState();
 }
 
-class _MonthEndClosingPageState extends State<MonthEndClosingPage> {
+class _HRMonthEndClosingPageState extends State<HRMonthEndClosingPage> {
   final MonthEndController controller = Get.put(MonthEndController());
 
   @override

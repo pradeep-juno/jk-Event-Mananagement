@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../controllers/departments.dart';
+import '../../controllers/departments.dart';
 
-class DepartmentsPage extends StatelessWidget {
-  DepartmentsPage({Key? key}) : super(key: key);
+class HRDepartmentsPage extends StatelessWidget {
+  HRDepartmentsPage({Key? key}) : super(key: key);
 
   final Departments departments = Get.put(Departments());
 

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 class EventCard extends StatefulWidget {
   final String name;
-  final String route;
+  final Widget route;
 
   const EventCard({required this.name, required this.route, Key? key})
       : super(key: key);
@@ -21,7 +21,7 @@ class _EventCardState extends State<EventCard> {
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
       child: GestureDetector(
-        onTap: () => Get.toNamed(widget.route),
+        onTap: () => Get.to(() => widget.route),
         child: AnimatedScale(
           scale: _isHovering ? 1.05 : 1.0, // Slight zoom on hover
           duration: Duration(milliseconds: 200), // Smooth animation duration

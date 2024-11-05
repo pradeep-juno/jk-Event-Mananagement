@@ -1,16 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Import this for input formatting
+import 'package:flutter/services.dart'; // For input formatting
 import 'package:get/get.dart';
+import 'package:jk_evnt_proj/screens/super_admin/super_admin_homepage.dart';
 
-import '../main.dart';
-// Ensure you import HomePage
+import 'hr/hr_home_page.dart';
 
-class LoginPage extends StatefulWidget {
+class JKLoginPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _JKLoginPageState createState() => _JKLoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _JKLoginPageState extends State<JKLoginPage> {
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -19,16 +20,69 @@ class _LoginPageState extends State<LoginPage> {
 
   final _formKey = GlobalKey<FormState>();
 
-  void _login() {
+  void _login() async {
     if (_formKey.currentState!.validate()) {
+      // Static login check for Super Admin
       if (_mobileController.text == correctMobile &&
           _passwordController.text == correctPassword) {
-        Get.off(() =>
-            const HomePage()); // Navigate to JK Event Management home page
+        Get.to(() => SuperAdminHomePage()); // Navigate to SuperAdminLoginPage
+        Get.snackbar(
+          'SUCCESS',
+          'Super Admin Login Successfully',
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      // Firestore instance to fetch staff data
+      final firestore = FirebaseFirestore.instance;
+      final staffCollection = firestore.collection('staffs');
+
+      // Fetch document(s) with matching mobile number
+      final querySnapshot = await staffCollection
+          .where('mobileNo', isEqualTo: _mobileController.text)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final staffData = querySnapshot.docs.first.data();
+        print("HR Login...");
+        print("MobileNumber : ${_mobileController.text}");
+        print("Password : ${_passwordController.text}");
+        print("Firestore Password: ${staffData['password']}");
+
+        if (staffData['password'] == _passwordController.text) {
+          String position = staffData['position'];
+
+          if (position == 'HR') {
+            Get.to(() => HRHomePage());
+            Get.snackbar(
+              'SUCCESS',
+              'HR Login Successfully',
+              backgroundColor: Colors.redAccent,
+              colorText: Colors.white,
+            );
+          } else {
+            Get.snackbar(
+              'Error',
+              'Unauthorized position',
+              backgroundColor: Colors.redAccent,
+              colorText: Colors.white,
+            );
+          }
+        } else {
+          Get.snackbar(
+            'Error',
+            'Invalid password',
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white,
+          );
+        }
       } else {
         Get.snackbar(
           'Error',
-          'Invalid username or password',
+          'Invalid mobile number',
           backgroundColor: Colors.redAccent,
           colorText: Colors.white,
         );
@@ -40,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: Center(child: Text('Login')),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -52,9 +106,9 @@ class _LoginPageState extends State<LoginPage> {
               TextFormField(
                 controller: _mobileController,
                 keyboardType: TextInputType.number,
-                maxLength: 10, // Limit input to 10 characters
+                maxLength: 10,
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly, // Allow only digits
+                  FilteringTextInputFormatter.digitsOnly,
                 ],
                 decoration: InputDecoration(
                   labelText: 'Mobile Number',
