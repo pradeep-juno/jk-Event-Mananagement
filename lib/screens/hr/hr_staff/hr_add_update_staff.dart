@@ -15,12 +15,14 @@ class _HrAddUpdateStaffPageState extends State<HrAddUpdateStaffPage> {
   String? selectedDepartment;
   String? selectedPosition;
   bool isEditMode = false;
-  String? docId;
+
+  String? docId; // ""
 
   @override
   void initState() {
     super.initState();
-    docId = Get.arguments as String?;
+
+    docId = Get.arguments as String?; //"docid"
 
     if (docId != null) {
       isEditMode = true;
@@ -115,33 +117,6 @@ class _HrAddUpdateStaffPageState extends State<HrAddUpdateStaffPage> {
     }
   }
 
-  Future<void> _saveStaff() async {
-    final data = {
-      'Name': controller.nameController.text,
-      'Mobile Number': controller.mobileController.text,
-      'Password': controller.passwordController.text,
-      'Address': controller.addressController.text,
-      'DOB': controller.dobController.text,
-      'Date of Joining': controller.dojController.text,
-      'Department': selectedDepartment,
-      'Position': selectedPosition,
-    };
-
-    if (isEditMode && docId != null) {
-      // Update existing staff data
-      await FirebaseFirestore.instance
-          .collection('Staffs')
-          .doc(docId)
-          .update(data);
-      Get.snackbar(
-          "Staff Updated", "Staff details have been updated successfully.");
-    } else {
-      // Add new staff data
-      await FirebaseFirestore.instance.collection('Staffs').add(data);
-      Get.snackbar("Staff Added", "New staff has been added successfully.");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,7 +190,9 @@ class _HrAddUpdateStaffPageState extends State<HrAddUpdateStaffPage> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: _saveStaff,
+                onPressed: () => isEditMode
+                    ? controller.updateStaff(isEditMode, docId)
+                    : controller.addStaff(),
                 child: Text(isEditMode ? 'Update Staff' : 'Save Staff'),
               ),
             ],

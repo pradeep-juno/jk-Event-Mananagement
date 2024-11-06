@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../controllers/staff_controller.dart';
 import 'hr_add_update_staff.dart';
 
 class HrStaffCreationsPage extends StatefulWidget {
@@ -12,6 +13,8 @@ class HrStaffCreationsPage extends StatefulWidget {
 }
 
 class _HrStaffCreationsPageState extends State<HrStaffCreationsPage> {
+  final StaffController controller = Get.put(StaffController());
+
   final CollectionReference staffsCollection =
       FirebaseFirestore.instance.collection('Staffs');
 
@@ -22,8 +25,7 @@ class _HrStaffCreationsPageState extends State<HrStaffCreationsPage> {
         title: const Text('HR Staff Creations'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            staffsCollection.orderBy('createdAt', descending: true).snapshots(),
+        stream: staffsCollection.snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -150,7 +152,7 @@ class _HrStaffCreationsPageState extends State<HrStaffCreationsPage> {
 
     // If confirmed, proceed with deletion
     if (confirmDelete == true) {
-      await staffsCollection.doc(id).delete();
+      await controller.deleteStaff(id);
       Get.snackbar("Staff Deleted", "The staff entry has been removed.");
     }
   }

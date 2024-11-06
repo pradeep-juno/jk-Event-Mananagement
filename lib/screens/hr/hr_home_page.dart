@@ -6,7 +6,7 @@ import 'package:jk_evnt_proj/screens/hr/hr_positions_page.dart';
 import 'package:jk_evnt_proj/screens/hr/hr_staff/hr_staff_creations_page.dart';
 import 'package:jk_evnt_proj/screens/jk_login_page.dart';
 
-import '../../page/designs.dart';
+import '../../ui_design/designs.dart';
 
 class HRHomePage extends StatelessWidget {
   const HRHomePage({super.key});

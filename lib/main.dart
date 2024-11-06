@@ -6,7 +6,6 @@ import 'package:jk_evnt_proj/routers/app_routers.dart';
 import 'package:jk_evnt_proj/utils/app_constants.dart';
 import 'package:month_year_picker/month_year_picker.dart'; // Import the package for localization
 
-import 'controllers/staffs.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -16,8 +15,6 @@ void main() async {
   ); // Initialize Firebase
 
   // Initialize the Staffs controller at the start of the app
-  Get.put(Staffs());
-
   runApp(const MyApp());
 }
 
@@ -40,9 +37,9 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [
-        Locale('en', ''), // Remove 'const' from here
+        Locale('en', ''),
       ],
-      initialRoute: AppRouters.LOGIN_PAGE, // Initial route
+      initialRoute: AppRouters.SUPER_ADMIN_HOME_PAGE, // Initial route
       getPages: AppRouters.routes,
     );
   }

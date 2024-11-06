@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'add_update_hr.dart';
+import '../../controllers/create_hr_controller.dart';
+import 'sa_add_update_hr.dart';
 
 class HrCreationPage extends StatefulWidget {
   const HrCreationPage({super.key});
@@ -12,32 +13,34 @@ class HrCreationPage extends StatefulWidget {
 }
 
 class _HrCreationPageState extends State<HrCreationPage> {
-  final CollectionReference staffsCollection =
-      FirebaseFirestore.instance.collection('Staffs');
+  final HrCreateController controller = Get.put(HrCreateController());
+  final CollectionReference hrcreateCollection =
+      FirebaseFirestore.instance.collection('HrCreate');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HR Staff Creations'),
+        title: const Text('HR  Creations'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            staffsCollection.orderBy('createdAt', descending: true).snapshots(),
+        stream: hrcreateCollection
+            .orderBy('Date of Joining', descending: true)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No staff data available.'));
+            return const Center(child: Text('No HR data available.'));
           }
 
-          final staffDocs = snapshot.data!.docs;
+          final hrcreateDocs = snapshot.data!.docs;
 
           return ListView.builder(
-            itemCount: staffDocs.length,
+            itemCount: hrcreateDocs.length,
             itemBuilder: (context, index) {
-              final DocumentSnapshot doc = staffDocs[index];
+              final DocumentSnapshot doc = hrcreateDocs[index];
               final data = doc.data() as Map<String, dynamic>?;
 
               // Extract the required fields
@@ -86,16 +89,12 @@ class _HrCreationPageState extends State<HrCreationPage> {
                     IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () {
-                        print("DOC ID : ${doc.id}");
-                        print(
-                            "Document Data : ${doc.data()}"); // Print all document data
-                        _showStaffDialog(context, id: doc.id);
+                        _showHrCreateDialog(context, id: doc.id);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete),
-                      onPressed: () => _confirmDeleteStaff(
-                          doc.id), // Call the function directly
+                      onPressed: () => _confirmDeleteHrCreate(doc.id),
                     )
                   ],
                 ),
@@ -106,39 +105,39 @@ class _HrCreationPageState extends State<HrCreationPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(() => AddUpdateHrPage());
+          Get.to(() => AddUpdateHR());
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  void _showStaffDialog(BuildContext context, {required String id}) {
-    Get.to(() => AddUpdateHrPage(), arguments: id);
+  void _showHrCreateDialog(BuildContext context, {required String id}) {
+    Get.to(() => AddUpdateHR(), arguments: id);
   }
 
-  Future<void> _deleteStaff(String id) async {
-    await staffsCollection.doc(id).delete();
-    Get.snackbar("Staff Deleted", "The staff entry has been removed.");
+  Future<void> _deleteHrCreate(String id) async {
+    await hrcreateCollection.doc(id).delete();
+    Get.snackbar("HR Deleted", "The HR entry has been removed.");
   }
 
-  Future<void> _confirmDeleteStaff(String id) async {
+  Future<void> _confirmDeleteHrCreate(String id) async {
     // Show confirmation dialog
     bool? confirmDelete = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Confirm Delete"),
-          content: Text("Are you sure you want to delete this staff?"),
+          title: const Text("Confirm Delete"),
+          content: const Text("Are you sure you want to delete this HR entry?"),
           actions: [
             TextButton(
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop(false); // Return false to cancel
               },
             ),
             TextButton(
-              child: Text("Delete"),
+              child: const Text("Delete"),
               onPressed: () {
                 Navigator.of(context).pop(true); // Return true to confirm
               },
@@ -150,8 +149,8 @@ class _HrCreationPageState extends State<HrCreationPage> {
 
     // If confirmed, proceed with deletion
     if (confirmDelete == true) {
-      await staffsCollection.doc(id).delete();
-      Get.snackbar("Staff Deleted", "The staff entry has been removed.");
+      await controller.deleteHRCreate(id);
+      Get.snackbar("HR Deleted", "The HR entry has been removed.");
     }
   }
 }

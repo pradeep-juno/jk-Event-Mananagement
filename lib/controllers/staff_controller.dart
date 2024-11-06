@@ -44,12 +44,52 @@ class StaffController extends GetxController {
     }
   }
 
+  Future<void> updateStaff(bool isEditMode, String? docId) async {
+    if (!await updateValidateInputs()) return;
+
+    final data = {
+      'Name': nameController.text,
+      'Mobile Number': mobileController.text,
+      'Password': passwordController.text,
+      'Address': addressController.text,
+      'DOB': dobController.text,
+      'Date of Joining': dojController.text,
+      'Department':
+          selectedDepartment.value, // Use .value if using Rx variables
+      'Position': selectedPosition.value, // Use .value if using Rx variables
+    };
+
+    if (isEditMode && docId != null) {
+      try {
+        // Update existing staff data
+        await FirebaseFirestore.instance
+            .collection('Staffs')
+            .doc(docId)
+            .update(data);
+        Get.snackbar(
+            "Staff Updated", "Staff details have been updated successfully.");
+      } catch (e) {
+        Get.snackbar("Error", "Failed to update staff: $e");
+      }
+    }
+  }
+
+  Future<void> deleteStaff(String? docId) async {
+    await FirebaseFirestore.instance.collection('Staffs').doc(docId).delete();
+  }
+
   // Validation function for all fields
   Future<bool> validateInputs() async {
     if (nameController.text.length < 3) {
       Get.snackbar('Validation Error', 'Name must be at least 3 characters.');
       return false;
     }
+
+    if (dobController.text.isEmpty) {
+      Get.snackbar('Validation Error', 'Please select Date of Birth.');
+      return false;
+    }
+
     if (!RegExp(r'^\d{10}$').hasMatch(mobileController.text)) {
       Get.snackbar('Validation Error', 'Mobile Number must be 10 digits.');
       return false;
@@ -79,10 +119,36 @@ class StaffController extends GetxController {
       Get.snackbar('Validation Error', 'Please select a position.');
       return false;
     }
+
+    if (dojController.text.isEmpty) {
+      Get.snackbar('Validation Error', 'Please select Date of Joining.');
+      return false;
+    }
+    return true;
+  }
+
+  Future<bool> updateValidateInputs() async {
+    if (nameController.text.length < 3) {
+      Get.snackbar('Validation Error', 'Name must be at least 3 characters.');
+      return false;
+    }
+
     if (dobController.text.isEmpty) {
       Get.snackbar('Validation Error', 'Please select Date of Birth.');
       return false;
     }
+
+    if (!RegExp(r'^\d{10}$').hasMatch(mobileController.text)) {
+      Get.snackbar('Validation Error', 'Mobile Number must be 10 digits.');
+      return false;
+    }
+
+    if (passwordController.text.length < 8) {
+      Get.snackbar(
+          'Validation Error', 'Password must be at least 8 characters.');
+      return false;
+    }
+
     if (dojController.text.isEmpty) {
       Get.snackbar('Validation Error', 'Please select Date of Joining.');
       return false;

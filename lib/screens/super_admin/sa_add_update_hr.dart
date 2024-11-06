@@ -2,20 +2,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:jk_evnt_proj/controllers/create_hr_controller.dart';
 
-import 'create_hr_controller.dart';
-
-class AddUpdateHrPage extends StatefulWidget {
+class AddUpdateHR extends StatefulWidget {
   @override
-  _AddUpdateHrPageState createState() => _AddUpdateHrPageState();
+  _AddUpdateHRState createState() => _AddUpdateHRState();
 }
 
-class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
-  final CreateHrController controller = Get.put(CreateHrController());
-  String? selectedDepartment;
-  String? selectedPosition;
+class _AddUpdateHRState extends State<AddUpdateHR> {
+  final HrCreateController controller = Get.put(HrCreateController());
+  String? selectedDepartment = 'HR Department';
+  String? selectedPosition = 'HR';
   bool isEditMode = false;
   String? docId;
+
+  // Add this variable to toggle password visibility
+  bool _isPasswordVisible = false;
 
   @override
   void initState() {
@@ -24,21 +26,21 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
 
     if (docId != null) {
       isEditMode = true;
-      _loadStaffData(docId!);
+      _loadHRData(docId!);
     }
 
-    controller.mobileController.addListener(() {
-      validateMobileNumber(controller.mobileController.text);
-    });
+    // controller.mobileController.addListener(() {
+    //   validateMobileNumber(controller.mobileController.text);
+    // });
 
-    controller.passwordController.addListener(() {
-      validatePassword(controller.passwordController.text);
-    });
+    // controller.passwordController.addListener(() {
+    //   validatePassword(controller.passwordController.text);
+    // });
   }
 
-  Future<void> _loadStaffData(String id) async {
+  Future<void> _loadHRData(String id) async {
     final doc =
-        await FirebaseFirestore.instance.collection('Staffs').doc(id).get();
+        await FirebaseFirestore.instance.collection('HrCreate').doc(id).get();
     if (doc.exists) {
       final data = doc.data();
       if (data != null) {
@@ -49,8 +51,8 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
           controller.addressController.text = data['Address'] ?? '';
           controller.dobController.text = data['DOB'] ?? '';
           controller.dojController.text = data['Date of Joining'] ?? '';
-          selectedDepartment = data['Department'];
-          selectedPosition = data['Position'];
+          selectedDepartment = data['Department'] ?? 'HR';
+          selectedPosition = data['Position'] ?? 'HR';
         });
       }
     }
@@ -59,7 +61,7 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
   Future<void> validateMobileNumber(String mobileNumber) async {
     if (mobileNumber.length == 10) {
       final querySnapshot = await FirebaseFirestore.instance
-          .collection('Staffs')
+          .collection('HrCreate')
           .where('Mobile Number', isEqualTo: mobileNumber)
           .get();
 
@@ -72,7 +74,10 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
   }
 
   void validatePassword(String password) {
-    // Add your password validation logic here if needed
+    if (password.length < 8) {
+      Get.snackbar(
+          'Validation Error', 'Password must be at least 8 characters.');
+    }
   }
 
   Widget buildTextField(
@@ -80,6 +85,8 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
     TextEditingController controller, {
     int maxLines = 1,
     List<TextInputFormatter>? inputFormatters,
+    bool isPassword = false,
+    bool readOnly = false,
   }) {
     inputFormatters ??= [];
 
@@ -92,9 +99,25 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
             controller: controller,
             maxLines: maxLines,
             inputFormatters: inputFormatters,
+            obscureText: isPassword && !_isPasswordVisible,
+            readOnly: readOnly, // Use readOnly here to make fields non-editable
             decoration: InputDecoration(
               labelText: label,
               border: OutlineInputBorder(),
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    )
+                  : null,
             ),
           ),
         ],
@@ -115,7 +138,7 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
     }
   }
 
-  Future<void> _saveStaff() async {
+  Future<void> _saveHRData() async {
     final data = {
       'Name': controller.nameController.text,
       'Mobile Number': controller.mobileController.text,
@@ -123,22 +146,21 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
       'Address': controller.addressController.text,
       'DOB': controller.dobController.text,
       'Date of Joining': controller.dojController.text,
-      'Department': selectedDepartment,
-      'Position': selectedPosition,
+      'Department': selectedDepartment, // Save as 'HR'
+      'Position': selectedPosition, // Save as 'HR'
     };
 
     if (isEditMode && docId != null) {
-      // Update existing staff data
+      // Update existing HR data
       await FirebaseFirestore.instance
-          .collection('Staffs')
+          .collection('HrCreate')
           .doc(docId)
           .update(data);
-      Get.snackbar(
-          "Staff Updated", "Staff details have been updated successfully.");
+      Get.snackbar("HR Updated", "HR details have been updated successfully.");
     } else {
-      // Add new staff data
-      await FirebaseFirestore.instance.collection('Staffs').add(data);
-      Get.snackbar("Staff Added", "New staff has been added successfully.");
+      // Add new HR data
+      await FirebaseFirestore.instance.collection('HrCreate').add(data);
+      Get.snackbar("HR Added", "New HR has been added successfully.");
     }
   }
 
@@ -146,7 +168,7 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditMode ? 'Edit Staff' : 'Add Staff'),
+        title: Text(isEditMode ? 'Edit HR' : 'Add HR'),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 200),
@@ -171,40 +193,24 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
               buildTextField(
                 'Password',
                 controller.passwordController,
+                isPassword: true, // Enable password field
                 inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(8),
                 ],
               ),
               buildTextField('Address', controller.addressController,
                   maxLines: 3),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: buildDropdown(
-                  'Department',
-                  selectedDepartment,
-                  'departments',
-                  (value) {
-                    setState(() {
-                      selectedDepartment = value;
-                      controller.selectedDepartment.value = value!;
-                    });
-                  },
-                ),
+              // Non-editable Department Field
+              buildTextField(
+                'Department',
+                TextEditingController(text: selectedDepartment),
+                readOnly: true, // Make the Department field non-editable
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: buildDropdown(
-                  'Position',
-                  selectedPosition,
-                  'positions',
-                  (value) {
-                    setState(() {
-                      selectedPosition = value;
-                      controller.selectedPosition.value = value!;
-                    });
-                  },
-                ),
+              // Non-editable Position Field
+              buildTextField(
+                'Position',
+                TextEditingController(text: selectedPosition),
+                readOnly: true, // Make the Position field non-editable
               ),
               GestureDetector(
                 onTap: () => pickDate(context, controller.dojController),
@@ -214,45 +220,20 @@ class _AddUpdateHrPageState extends State<AddUpdateHrPage> {
                 ),
               ),
               const SizedBox(height: 16),
+
               ElevatedButton(
-                onPressed: _saveStaff,
-                child: Text(isEditMode ? 'Update Staff' : 'Save Staff'),
-              ),
+                onPressed: () {
+                  print(isEditMode ? 'Updating HR' : 'Saving HR');
+                  isEditMode
+                      ? controller.updateHRCreate(isEditMode, docId)
+                      : controller.addHrCreate();
+                },
+                child: Text(isEditMode ? 'Update HR' : 'Save HR'),
+              )
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget buildDropdown(String label, String? selectedValue,
-      String collectionName, ValueChanged<String?> onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        FutureBuilder<QuerySnapshot>(
-          future: FirebaseFirestore.instance.collection(collectionName).get(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) return const CircularProgressIndicator();
-            final items = snapshot.data!.docs
-                .map((doc) => doc['name'].toString())
-                .toList();
-            return DropdownButton<String>(
-              value: selectedValue,
-              hint: Text('Select $label'),
-              items: items.map((item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(item),
-                );
-              }).toList(),
-              onChanged: onChanged,
-              isExpanded: true,
-            );
-          },
-        ),
-      ],
     );
   }
 }

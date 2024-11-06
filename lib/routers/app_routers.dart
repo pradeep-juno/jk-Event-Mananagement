@@ -2,10 +2,10 @@ import 'package:get/get.dart';
 import 'package:jk_evnt_proj/screens/hr/hr_departments_page.dart';
 import 'package:jk_evnt_proj/screens/hr/hr_month_end_closing_page.dart';
 import 'package:jk_evnt_proj/screens/hr/hr_positions_page.dart';
-import 'package:jk_evnt_proj/screens/hr/hr_staff_creation.dart';
 import 'package:jk_evnt_proj/screens/jk_login_page.dart';
 
 import '../screens/hr/hr_home_page.dart';
+import '../screens/super_admin/hr_creation_page.dart';
 import '../screens/super_admin/super_admin_homepage.dart';
 
 class AppRouters {
@@ -23,6 +23,7 @@ class AppRouters {
   static const HR_POSITION_PAGE = "/hr-position-page";
   static const HR_STAFF_CREATION = "/hr-staff-creation-page";
   static const HR_MONTH_END_CLOSING_PAGE = "/hr-month-end-closing-page";
+  static const HR_CREATION_PAGE = "/hr-creation-page";
 
   static final routes = [
     GetPage(
@@ -46,12 +47,12 @@ class AppRouters {
       page: () => HRPositionsPage(),
     ),
     GetPage(
-      name: HR_STAFF_CREATION,
-      page: () => HRStaffCreationPage(),
-    ),
-    GetPage(
       name: HR_MONTH_END_CLOSING_PAGE,
       page: () => HRMonthEndClosingPage(),
+    ),
+    GetPage(
+      name: HR_CREATION_PAGE, // Register the new HR Creation page
+      page: () => HrCreationPage(),
     ),
   ];
 }

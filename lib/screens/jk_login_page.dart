@@ -37,11 +37,11 @@ class _JKLoginPageState extends State<JKLoginPage> {
 
       // Firestore instance to fetch staff data
       final firestore = FirebaseFirestore.instance;
-      final staffCollection = firestore.collection('staffs');
+      final staffCollection = firestore.collection('HrCreate');
 
       // Fetch document(s) with matching mobile number
       final querySnapshot = await staffCollection
-          .where('mobileNo', isEqualTo: _mobileController.text)
+          .where('Mobile Number', isEqualTo: _mobileController.text)
           .limit(1)
           .get();
 
@@ -52,8 +52,8 @@ class _JKLoginPageState extends State<JKLoginPage> {
         print("Password : ${_passwordController.text}");
         print("Firestore Password: ${staffData['password']}");
 
-        if (staffData['password'] == _passwordController.text) {
-          String position = staffData['position'];
+        if (staffData['Password'] == _passwordController.text) {
+          String position = staffData['Position'];
 
           if (position == 'HR') {
             Get.to(() => HRHomePage());
